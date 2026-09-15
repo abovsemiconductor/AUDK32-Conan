@@ -1,0 +1,7 @@
+sources:
+  "1.0.13":
+    url: "https://github.com/abovsemiconductor/AUDK32-A31xxxx.git"
+    ref: "v1.0.13"
+    submodules:
+      - "Framework/CMSIS/Core"
+      - "Platform/HAL"

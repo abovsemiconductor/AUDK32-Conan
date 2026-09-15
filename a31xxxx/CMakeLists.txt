@@ -1,0 +1,81 @@
+cmake_minimum_required(VERSION 3.15)
+
+set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
+project(audk32_hal C ASM)
+
+if(NOT AUDK32_FAMILY)
+    message(FATAL_ERROR "AUDK32_FAMILY must be set, e.g. -DAUDK32_FAMILY=A31C12x")
+endif()
+
+set(PRODUCT_CONFIG_DIR "${CMAKE_CURRENT_SOURCE_DIR}/ProductConfig/${AUDK32_FAMILY}")
+if(NOT EXISTS "${PRODUCT_CONFIG_DIR}")
+    message(FATAL_ERROR "Unknown AUDK32_FAMILY '${AUDK32_FAMILY}': ${PRODUCT_CONFIG_DIR} does not exist")
+endif()
+
+file(GLOB_RECURSE AUDK32_HAL_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/Platform/HAL/*.c")
+
+add_library(audk32_hal STATIC ${AUDK32_HAL_SOURCES})
+
+target_include_directories(audk32_hal PUBLIC
+    Framework/CMSIS/Core/Include
+    Framework/CMSIS/Device/ABOV/Include
+    ProductConfig/Config
+    ${PRODUCT_CONFIG_DIR}/Config
+    Platform/HAL/Include
+    Platform/HAL/HPL/Include
+)
+
+target_compile_definitions(audk32_hal PUBLIC
+    "EXTRN_SUBFAMILY_${AUDK32_FAMILY}"
+    CONFIG_HAL_ADC=1
+    CONFIG_HAL_AES=1
+    CONFIG_HAL_AFE=1
+    CONFIG_HAL_CMP=1
+    CONFIG_HAL_CRC=1
+    CONFIG_HAL_DAC=1
+    CONFIG_HAL_DMAC=1
+    CONFIG_HAL_EBI=1
+    CONFIG_HAL_FMC=1
+    CONFIG_HAL_FRT=1
+    CONFIG_HAL_HSICMU=1
+    CONFIG_HAL_I2C=1
+    CONFIG_HAL_LCD=1
+    CONFIG_HAL_LED=1
+    CONFIG_HAL_LPUART=1
+    CONFIG_HAL_MPWM=1
+    CONFIG_HAL_PGA=1
+    CONFIG_HAL_PWM=1
+    CONFIG_HAL_QEI=1
+    CONFIG_HAL_QSPI=1
+    CONFIG_HAL_RNG=1
+    CONFIG_HAL_RTC=1
+    CONFIG_HAL_SCU_LVD=1
+    CONFIG_HAL_SCU_PWR=1
+    CONFIG_HAL_SPI=1
+    CONFIG_HAL_TEMPSENS=1
+    CONFIG_HAL_TIMER1=1
+    CONFIG_HAL_TIMER2=1
+    CONFIG_HAL_TIMER3=1
+    CONFIG_HAL_TIMER4=1
+    CONFIG_HAL_TIMER4E=1
+    CONFIG_HAL_TIMER5=1
+    CONFIG_HAL_TIMER6=1
+    CONFIG_HAL_TRNG=1
+    CONFIG_HAL_UART=1
+    CONFIG_HAL_USART=1
+    CONFIG_HAL_USB=1
+    CONFIG_HAL_VREFBUF=1
+    CONFIG_HAL_WT=1
+    CONFIG_HAL_WDT=1
+)
+
+target_compile_options(audk32_hal PRIVATE
+    -mcpu=cortex-m0plus
+    -mthumb
+    -ffunction-sections
+    -fdata-sections
+)
+
+install(TARGETS audk32_hal ARCHIVE DESTINATION lib)
+
+install(DIRECTORY Platform/HAL/Include/ DESTINATION include)
